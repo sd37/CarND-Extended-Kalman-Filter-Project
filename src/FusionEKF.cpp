@@ -47,6 +47,24 @@ FusionEKF::FusionEKF() {
             0, 0, 1000, 0,
             0, 0, 0, 1000;
 
+    //measurement covariance
+    ekf_.R_ = MatrixXd(2, 2);
+    ekf_.R_ << 0.0225, 0,
+            0, 0.0225;
+
+    //measurement matrix
+    ekf_.H_ = MatrixXd(2, 4);
+    ekf_.H_ << 1, 0, 0, 0,
+            0, 1, 0, 0;
+
+
+    //the initial transistion matrix F_
+    ekf_.F_ = MatrixXd(4, 4);
+    ekf_.F_ << 1, 0, 1, 0,
+            0, 1, 0, 1,
+            0, 0, 1, 0,
+            0, 0, 0, 1;
+
 }
 
 /**
