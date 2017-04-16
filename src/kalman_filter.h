@@ -64,6 +64,7 @@ public:
    */
   void UpdateEKF(const Eigen::VectorXd &z);
 
+  Eigen::VectorXd CalculateHx();
 };
 
 #endif /* KALMAN_FILTER_H_ */
