@@ -93,7 +93,7 @@ VectorXd KalmanFilter::CalculateHx() {
         rhodot = (px * vx + py * vy) / rho;
     }
     else {
-        rhodot = (px * vx + py * vy) / 0.001;
+        rhodot = 0.0;
     }
     hx << rho, phi, rhodot;
     return hx;
