@@ -48,10 +48,14 @@ FusionEKF::FusionEKF() {
             0, 0, 0, 1000;
 
 
-    //measurement matrix
-    ekf_.H_ = MatrixXd(2, 4);
-    ekf_.H_ << 1, 0, 0, 0,
+    // laser measurement matrix
+    H_laser_ << 1, 0, 0, 0,
             0, 1, 0, 0;
+
+    // radar Jacobian matrix
+    Hj_ << 1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0;
 
 
     //the initial transistion matrix F_
@@ -70,6 +74,9 @@ FusionEKF::~FusionEKF() {}
 
 void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
+    float px, py, vx, vy;
+    float rho, phi, rhodot;
+
 
     /*****************************************************************************
      *  Initialization
@@ -84,16 +91,27 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
         // first measurement
 
         // set the initial state with first measurement position and 0 velocity.
-        ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
 
         if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
             /**
             Convert radar from polar to cartesian coordinates and initialize state.
             */
+            rho = measurement_pack.raw_measurements_(0);
+            phi = measurement_pack.raw_measurements_(1);
+            rhodot = measurement_pack.raw_measurements_(2);
+
+            px = rho * cos(phi);
+            py = rho * sin(phi);
+            vx = rhodot * cos(phi);
+            vy = rhodot * sin(phi);
+
+            ekf_.x_ << px, py, vx, vy;
+
         } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
             /**
             Initialize state.
             */
+            ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0.0, 0.0;
         }
 
         previous_timestamp_ = measurement_pack.timestamp_;
@@ -156,8 +174,11 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
         ekf_.UpdateEKF(measurement_pack.raw_measurements_);
     } else {
         // Laser updates
+        VectorXd laser_measurements(2);
+        laser_measurements << measurement_pack.raw_measurements_(0), measurement_pack.raw_measurements_(1);
         ekf_.R_ = R_laser_;
-        ekf_.Update(measurement_pack.raw_measurements_);
+        ekf_.H_ = H_laser_;
+        ekf_.Update(laser_measurements);
     }
 
     // print the output
