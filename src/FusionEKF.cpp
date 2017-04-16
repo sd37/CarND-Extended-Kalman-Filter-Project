@@ -47,10 +47,6 @@ FusionEKF::FusionEKF() {
             0, 0, 1000, 0,
             0, 0, 0, 1000;
 
-    //measurement covariance
-    ekf_.R_ = MatrixXd(2, 2);
-    ekf_.R_ << 0.0225, 0,
-            0, 0.0225;
 
     //measurement matrix
     ekf_.H_ = MatrixXd(2, 4);
