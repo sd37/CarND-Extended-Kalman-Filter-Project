@@ -183,9 +183,12 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
         // Laser updates
         VectorXd laser_measurements(2);
         laser_measurements << measurement_pack.raw_measurements_(0), measurement_pack.raw_measurements_(1);
-        ekf_.R_ = R_laser_;
-        ekf_.H_ = H_laser_;
-        ekf_.Update(laser_measurements);
+        if (fabs(laser_measurements(0)) < 0.001 && fabs(laser_measurements(1)) < 0.001) { ;
+        } else {
+            ekf_.R_ = R_laser_;
+            ekf_.H_ = H_laser_;
+            ekf_.Update(laser_measurements);
+        }
     }
 
     // print the output

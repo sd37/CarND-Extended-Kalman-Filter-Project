@@ -89,12 +89,7 @@ VectorXd KalmanFilter::CalculateHx() {
         phi = atan2(py, 0.001);
     }
 
-    if(fabs(rho) < 0.001) {
-        rhodot = (px * vx + py * vy) / 0.001;
-    }
-    else {
-        rhodot = (px * vx + py * vy) / rho;
-    }
+    rhodot = (px * vx + py * vy) / rho;
     hx << rho, phi, rhodot;
     return hx;
 }
